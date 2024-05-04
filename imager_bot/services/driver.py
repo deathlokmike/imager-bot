@@ -1,8 +1,7 @@
+import time
 from dataclasses import dataclass
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
 
 
 @dataclass
@@ -13,11 +12,20 @@ class PageData:
 
 class Browser:
     def __init__(self):
-        self.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-        self.driver.set_window_size(1366, 968)
+        options = webdriver.ChromeOptions()
+        options.add_argument("start-maximized")
+        options.add_argument("enable-automation")
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--disable-browser-side-navigation")
+        options.add_argument("--disable-gpu")
+        options.add_argument('--remote-debugging-pipe')
+        self.driver = webdriver.Chrome(options=options)
 
     def get_screenshot(self, url: str) -> PageData:
         self.driver.get(url)
+        time.sleep(0.5)  # for bad loading pages
         screenshot = self.driver.get_screenshot_as_png()
         title = self.driver.title
         self.driver.close()
