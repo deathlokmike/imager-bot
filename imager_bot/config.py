@@ -21,9 +21,6 @@ class Settings(BaseSettings):
     TEST_DB_PASS: str
     TEST_DB_NAME: str
 
-    REDIS_HOST: str
-    REDIS_PORT: int
-
     @property
     def get_test_database_url(self) -> str:
         return f"{self.TEST_DB_USER}:{self.TEST_DB_PASS}@{self.TEST_DB_HOST}:{self.TEST_DB_PORT}/{self.TEST_DB_NAME}"
