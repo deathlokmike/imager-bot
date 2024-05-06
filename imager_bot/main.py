@@ -1,6 +1,7 @@
 import logging
 
-from telegram.ext import (ApplicationBuilder, CommandHandler, CallbackQueryHandler)
+from telegram.ext import (ApplicationBuilder, CallbackQueryHandler,
+                          CommandHandler, MessageHandler, filters)
 
 from imager_bot import handlers
 from imager_bot.config import settings
@@ -27,6 +28,10 @@ def main():
         application.add_handler(CommandHandler(command_name, command_handler))
     for pattern, handler in CALLBACK_QUERY_HANDLERS.items():
         application.add_handler(CallbackQueryHandler(handler, pattern=pattern))
+
+    application.add_handler(
+        MessageHandler(filters.TEXT & (~filters.COMMAND), handlers.take_screenshot)
+    )
     application.run_polling()
 
 

@@ -1,13 +1,8 @@
 import time
-from dataclasses import dataclass
 
 from selenium import webdriver
 
-
-@dataclass
-class PageData:
-    screenshot: bytes
-    title: str
+from imager_bot.services.types import PageData
 
 
 class Browser:

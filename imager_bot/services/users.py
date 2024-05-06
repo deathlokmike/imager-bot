@@ -1,23 +1,12 @@
-from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from imager_bot.database.dao.stats import UsersStatisticsDaO
 from imager_bot.database.dao.users import UsersDaO
 from imager_bot.services.translator import Translator
+from imager_bot.services.types import MessageLocale, StartMessageLocale
 
 if TYPE_CHECKING:
     from imager_bot.database.models.users import Users
-
-
-@dataclass
-class MessageLocales:
-    main: str
-
-
-@dataclass
-class StartMessageLocales(MessageLocales):
-    choose_lang_button: str
-    add_bot_to_group_button: str
 
 
 class UsersService:
@@ -34,19 +23,19 @@ class UsersService:
         return user
 
     @classmethod
-    async def get_start_message(cls, tg_id: int) -> StartMessageLocales:
+    async def get_start_message(cls, tg_id: int) -> StartMessageLocale:
         user = await cls._validate_user(tg_id)
         await UsersStatisticsDaO.increase_start(tg_id)
         translator = Translator(user.locale)
-        start_message_locale: StartMessageLocales = translator.get_translate("start", StartMessageLocales)
+        start_message_locale: StartMessageLocale = translator.get_translate("start", StartMessageLocale)
 
         return start_message_locale
 
     @classmethod
-    async def get_choose_language_message(cls, tg_id: int) -> MessageLocales:
+    async def get_choose_language_message(cls, tg_id: int) -> MessageLocale:
         user = await cls._validate_user(tg_id)
         translator = Translator(user.locale)
-        message_locale: MessageLocales = translator.get_translate("choose_lang", MessageLocales)
+        message_locale: MessageLocale = translator.get_translate("choose_lang", MessageLocale)
 
         return message_locale
 
