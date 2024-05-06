@@ -1,6 +1,12 @@
 import json
 
 
+def get_available_locales() -> dict[str, str]:
+    with open(f"imager_bot/locales/available.json", encoding="utf-8") as file:
+        available = json.load(file)
+    return dict(available)
+
+
 class Translator:
     _instances: dict[str, 'Translator'] = {}
 
