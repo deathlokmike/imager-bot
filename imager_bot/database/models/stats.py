@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import types
-from sqlalchemy.orm import mapped_column, Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 from imager_bot.database.models.base import Base
 

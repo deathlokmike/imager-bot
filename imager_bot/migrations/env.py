@@ -1,14 +1,13 @@
 from logging.config import fileConfig
 
-from imager_bot.database.models.roles import Roles
-from imager_bot.database.models.users import Users
-from imager_bot.database.models.stats import UsersStatistics
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from imager_bot.config import settings
 from imager_bot.database.models.base import Base
+from imager_bot.database.models.roles import Roles
+from imager_bot.database.models.stats import UsersStatistics
+from imager_bot.database.models.users import Users
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

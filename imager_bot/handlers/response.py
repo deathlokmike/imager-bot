@@ -1,7 +1,7 @@
 from typing import Optional
 
-from telegram import Update, InlineKeyboardMarkup, Message
-from telegram.ext import (ContextTypes)
+from telegram import InlineKeyboardMarkup, Message, Update
+from telegram.ext import ContextTypes
 
 
 async def send_text(
