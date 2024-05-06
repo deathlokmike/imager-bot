@@ -1,8 +1,8 @@
 """Init
 
-Revision ID: 66ca09dcce96
+Revision ID: 7cb28c6a8651
 Revises: 
-Create Date: 2024-05-06 15:12:38.683061
+Create Date: 2024-05-06 17:20:18.837321
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '66ca09dcce96'
+revision: str = '7cb28c6a8651'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,6 +27,8 @@ def upgrade() -> None:
     )
     op.create_table('user_statistics',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('start_date', sa.DateTime(), nullable=False),
+    sa.Column('last_message_date', sa.DateTime(), nullable=False),
     sa.Column('start_message_count', sa.Integer(), nullable=False),
     sa.Column('screenshot_message_count', sa.Integer(), nullable=False),
     sa.Column('bad_request_count', sa.Integer(), nullable=False),
@@ -34,8 +36,6 @@ def upgrade() -> None:
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('start_date', sa.DateTime(), nullable=False),
-    sa.Column('last_message_date', sa.DateTime(), nullable=False),
     sa.Column('locale', sa.String(length=2), nullable=False),
     sa.Column('role_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
