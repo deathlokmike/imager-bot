@@ -48,7 +48,7 @@ async def whois_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         return
     domain = _get_current_domain(query.data)
     text = await ScreenshotService.get_whois_data(domain, update.effective_user.id)
-    await send_text(update, context, text)
+    await send_text(update, context, text[:4096], enable_parse_mode=False)
 
 
 def _get_current_domain(query_data) -> str:

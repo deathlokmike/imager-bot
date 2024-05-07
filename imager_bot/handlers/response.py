@@ -9,16 +9,18 @@ async def send_text(
         context: ContextTypes.DEFAULT_TYPE,
         text: str,
         markup: Optional[InlineKeyboardMarkup] = None,
-        is_reply: bool = False) -> int:
+        is_reply=False,
+        enable_parse_mode=True) -> int:
     args = {
         "chat_id": update.effective_chat.id,
         "text": text,
-        "parse_mode": "html"
     }
     if is_reply:
         args["reply_to_message_id"] = update.message.message_id
     if markup:
         args["reply_markup"] = markup
+    if enable_parse_mode:
+        args["parse_mode"] = "html"
 
     message: Message = await context.bot.send_message(**args)
     return message.message_id
