@@ -8,7 +8,7 @@ from imager_bot.database.models.roles import Roles
 class Users(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(types.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(types.BigInteger(), primary_key=True)
     locale: Mapped[str] = mapped_column(types.String(2), default="ru", nullable=False)
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), default=0, nullable=False)
 
