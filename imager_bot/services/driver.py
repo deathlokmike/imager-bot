@@ -24,8 +24,10 @@ class Browser:
         time.sleep(0.5)  # for bad loading pages
         screenshot = self.driver.get_screenshot_as_png()
         title = self.driver.title
+        domain = self.driver.execute_script("return document.domain;")
         self.driver.close()
         return PageData(
             screenshot=screenshot,
-            title=title
+            title=title,
+            domain=domain
         )

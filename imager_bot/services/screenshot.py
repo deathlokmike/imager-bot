@@ -1,7 +1,9 @@
 import time
+import asyncio
 
 import httpx
 import validators
+from selenium.common.exceptions import WebDriverException
 
 from imager_bot.database.dao.stats import UsersStatisticsDaO
 from imager_bot.database.dao.users import UsersDaO
@@ -9,7 +11,7 @@ from imager_bot.services.driver import Browser
 from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.translator import Translator
 from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
-from selenium.common.exceptions import WebDriverException
+from imager_bot.services.whois import get_whois_text
 
 
 async def upload_image_to_telegraph(image: bytes) -> str:
@@ -54,7 +56,8 @@ class ScreenshotService:
                 explained_time=explained_time,
                 title=page_data.title,
                 img_source=f'https://telegra.ph{src}',
-                url=url
+                url=url,
+                domain=page_data.domain
             )
         except (WebDriverException, UploadException) as exc:
             await UsersStatisticsDaO.increase_bad_request(tg_id)
@@ -67,3 +70,9 @@ class ScreenshotService:
         locale: ScreenshotMessageLocale = translator.get_translate("screenshot", ScreenshotMessageLocale)
 
         return locale
+
+    @classmethod
+    async def get_whois_data(cls, domain: str, tg_id: int) -> str:
+        w = await get_whois_text(domain)
+        await UsersStatisticsDaO.increase_whois_request(tg_id)
+        return w

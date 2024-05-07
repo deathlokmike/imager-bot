@@ -48,6 +48,7 @@ async def lang_button(update: Update, _: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     if not query.data:
         return
+
     current_lang = _get_current_lang(query.data)
     await UsersService.set_language(update.effective_user.id, current_lang)
     locales, reply_markup = await get_start_locales_and_markup(update)

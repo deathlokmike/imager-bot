@@ -26,9 +26,11 @@ class ScreenshotData:
     title: str
     img_source: str
     url: str
+    domain: str
 
 
 @dataclass
 class PageData:
     screenshot: bytes
     title: str
+    domain: str

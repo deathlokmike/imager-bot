@@ -2,23 +2,22 @@ from selenium.common.exceptions import WebDriverException
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
+from imager_bot.config import settings
 from imager_bot.handlers.response import edit_text, send_text
 from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.screenshot import ScreenshotService
-from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
-
-# from whois import whois
+from imager_bot.services.types import (ScreenshotData, ScreenshotMessageLocale)
 
 
 def _get_successful_response_template(
         locale: ScreenshotMessageLocale,
-        screenshot_info: ScreenshotData) -> str:
-    return (f"📎<b>{screenshot_info.title}</b>\n\n"
-            f"🌐<b>{locale.website}:</b> <a href='{screenshot_info.img_source}'>&#160;</a>{screenshot_info.url}\n"
-            f"⌛<b>{locale.process_time}:</b> {screenshot_info.explained_time:.2f}")
+        screenshot_data: ScreenshotData) -> str:
+    return (f"📎<b>{screenshot_data.title}</b>\n\n"
+            f"🌐<b>{locale.website}:</b> <a href='{screenshot_data.img_source}'>&#160;</a>{screenshot_data.url}\n"
+            f"⌛<b>{locale.process_time}:</b> {screenshot_data.explained_time:.2f}")
 
 
-async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         url = await ScreenshotService.get_url(update.message.text, update.effective_user.id)
     except ValidationException:
@@ -34,29 +33,24 @@ async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     keyboard = [
-        [InlineKeyboardButton("🔍" + locale.detail, callback_data=url)],
+        [InlineKeyboardButton("🔍" + locale.detail,
+                              callback_data=settings.PATTERNS.WHOIS_CALLBACK + screenshot_data.domain)],
     ]
     markup = InlineKeyboardMarkup(keyboard)
     text = _get_successful_response_template(locale, screenshot_data)
     await edit_text(update, context, text=text, message_id=message_id, markup=markup)
 
-# async def button(update: Update, _: ContextTypes.DEFAULT_TYPE) -> None:
-#     query = update.callback_query
-#     w = whois(query.data)
-#     if isinstance(w.get('creation_date'), list):
-#         creation_date = w.get('creation_date')[0]
-#     else:
-#         creation_date = w.get('creation_date')
-#     if isinstance(w.get('expiration_date'), list):
-#         expiration_date = w.get('expiration_date')[0]
-#     else:
-#         expiration_date = w.get('expiration_date')
-#
-#     info = (f"WHOIS:\n"
-#             f"Регистратор: {w.get('registrar')}\n"
-#             f"Зарегистрирован: {creation_date}\n"
-#             f"До: {expiration_date}\n"
-#             f"DNS-сервера:\n {w.get('name_servers')[-4:]} \n"
-#             f"Организация: {w.get('org')}\n"
-#             )
-#     await query.answer(show_alert=True, text=info[0:200])
+
+async def whois_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    if not query.data:
+        return
+    domain = _get_current_domain(query.data)
+    text = await ScreenshotService.get_whois_data(domain, update.effective_user.id)
+    await send_text(update, context, text)
+
+
+def _get_current_domain(query_data) -> str:
+    pattern_prefix_length = len(settings.PATTERNS.WHOIS_CALLBACK)
+    return query_data[pattern_prefix_length:]

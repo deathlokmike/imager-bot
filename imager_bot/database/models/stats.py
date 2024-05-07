@@ -15,3 +15,4 @@ class UsersStatistics(Base):
     start_message_count: Mapped[int] = mapped_column(types.Integer, default=0)
     screenshot_message_count: Mapped[int] = mapped_column(types.Integer, default=0)
     bad_request_count: Mapped[int] = mapped_column(types.Integer, default=0)
+    whois_request_count: Mapped[int] = mapped_column(types.Integer, default=0)

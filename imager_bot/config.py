@@ -7,6 +7,7 @@ class Patterns:
     CHOOSE_LANG_CALLBACK = "choose_lang_btn"
     LANG_CALLBACK = "lang_"
     ADD_BOT_TO_GROUP_CALLBACK = "add_bot_to_group_btn"
+    WHOIS_CALLBACK = "whois_btn_"
 
 
 class Settings(BaseSettings):

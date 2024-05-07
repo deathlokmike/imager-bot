@@ -9,6 +9,7 @@ from imager_bot.config import settings
 CALLBACK_QUERY_HANDLERS = {
     rf"^{settings.PATTERNS.CHOOSE_LANG_CALLBACK}$": handlers.choose_lang_button,
     rf"^{settings.PATTERNS.LANG_CALLBACK}\w{{2}}$": handlers.lang_button,
+    rf"^{settings.PATTERNS.WHOIS_CALLBACK}(\S+)$": handlers.whois_button,
 }
 
 COMMAND_HANDLERS = {
@@ -40,5 +41,4 @@ if __name__ == '__main__':
         main()
     except Exception:
         import traceback
-
         logger.warning(traceback.format_exc())

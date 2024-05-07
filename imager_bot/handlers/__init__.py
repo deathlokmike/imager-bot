@@ -1,4 +1,4 @@
-from .screenshot import take_screenshot
+from .screenshot import take_screenshot, whois_button
 from .start import choose_lang_button, lang_button, start
 
 __all__ = [
@@ -6,4 +6,5 @@ __all__ = [
     "lang_button",
     "choose_lang_button",
     "take_screenshot",
+    "whois_button",
 ]

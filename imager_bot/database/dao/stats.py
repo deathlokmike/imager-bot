@@ -41,3 +41,8 @@ class UsersStatisticsDaO(BaseDAO):
         arg = {"bad_request_count": UsersStatistics.__table__.c.bad_request_count + 1}
         await cls._increase_value(tg_id, **arg)
 
+    @classmethod
+    async def increase_whois_request(cls, tg_id: int):
+        arg = {"whois_request_count": UsersStatistics.__table__.c.whois_request_count + 1}
+        await cls._increase_value(tg_id, **arg)
+
