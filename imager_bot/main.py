@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 def main():
-    application = ApplicationBuilder().token(settings.TG_BOT_TOKEN).build()
+    application = ApplicationBuilder().token(settings.TG_BOT_TOKEN).concurrent_updates(True).build()
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
     for pattern, handler in CALLBACK_QUERY_HANDLERS.items():

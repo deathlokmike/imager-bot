@@ -1,4 +1,9 @@
+import asyncio
 import time
+from asyncio.events import AbstractEventLoop
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+from typing import TYPE_CHECKING
 
 import httpx
 import validators
@@ -12,6 +17,9 @@ from imager_bot.services.translator import Translator
 from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
 from imager_bot.services.whois import get_whois_text
 
+if TYPE_CHECKING:
+    from imager_bot.services.types import PageData
+
 
 async def upload_image_to_telegraph(image: bytes) -> str:
     async with httpx.AsyncClient() as client:
@@ -23,6 +31,20 @@ async def upload_image_to_telegraph(image: bytes) -> str:
             return json_.get("src")
         else:
             raise UploadException
+
+
+def _screenshot_task(url: str) -> "PageData":
+    return Browser().get_screenshot(url)
+
+
+async def execute_screenshot_task(url: str) -> "PageData":
+    with ProcessPoolExecutor() as process_pool:
+        loop: AbstractEventLoop = asyncio.get_running_loop()
+        call = partial(_screenshot_task, url)
+        tasks = [loop.run_in_executor(process_pool, call)]
+        results = await asyncio.gather(*tasks)
+        for result in results:
+            return result
 
 
 class ScreenshotService:
@@ -47,7 +69,7 @@ class ScreenshotService:
     async def get_data(cls, url: str, tg_id: int) -> ScreenshotData:
         start_ = time.time()
         try:
-            page_data = Browser().get_screenshot(url)
+            page_data = await execute_screenshot_task(url)
             explained_time = time.time() - start_
             src = await upload_image_to_telegraph(page_data.screenshot)
             await UsersStatisticsDaO.increase_screenshot(tg_id)
