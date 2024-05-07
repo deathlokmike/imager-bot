@@ -1,7 +1,7 @@
 import time
-from urllib.parse import urlparse
 
 import httpx
+import validators
 
 from imager_bot.database.dao.users import UsersDaO
 from imager_bot.services.driver import Browser
@@ -26,16 +26,9 @@ class ScreenshotService:
 
     @classmethod
     def validate_url(cls, _url: str) -> str:
-        def validate():
-            try:
-                result = urlparse(_url)
-                return all([result.scheme, result.netloc])
-            except AttributeError:
-                return False
-
-        if not validate():
+        if not validators.url(_url):
             _url = f'http://' + _url
-            if not validate():
+            if not validators.url(_url):
                 raise ValidationException
         return _url
 
