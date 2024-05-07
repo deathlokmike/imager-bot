@@ -6,7 +6,7 @@ from imager_bot.config import settings
 from imager_bot.handlers.response import edit_text, send_text
 from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.screenshot import ScreenshotService
-from imager_bot.services.types import (ScreenshotData, ScreenshotMessageLocale)
+from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
 
 
 def _get_successful_response_template(
