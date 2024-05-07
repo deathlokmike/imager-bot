@@ -16,13 +16,28 @@ class UsersStatisticsDaO(BaseDAO):
         return await super().add(**data)
 
     @classmethod
-    async def increase_start(cls, tg_id):
+    async def _increase_value(cls, tg_id: int, **arg):
         async with async_session() as session:
             query = (
                 update(UsersStatistics)
                 .filter(UsersStatistics.id == tg_id).
-                values(start_message_count=UsersStatistics.__table__.c.start_message_count + 1,
-                       last_message_date=naive_utcnow())
+                values(**arg, last_message_date=naive_utcnow())
             )
         await session.execute(query)
         await session.commit()
+
+    @classmethod
+    async def increase_start(cls, tg_id: int):
+        arg = {"start_message_count": UsersStatistics.__table__.c.start_message_count + 1}
+        await cls._increase_value(tg_id, **arg)
+
+    @classmethod
+    async def increase_screenshot(cls, tg_id: int):
+        arg = {"screenshot_message_count": UsersStatistics.__table__.c.screenshot_message_count + 1}
+        await cls._increase_value(tg_id, **arg)
+
+    @classmethod
+    async def increase_bad_request(cls, tg_id: int):
+        arg = {"bad_request_count": UsersStatistics.__table__.c.bad_request_count + 1}
+        await cls._increase_value(tg_id, **arg)
+

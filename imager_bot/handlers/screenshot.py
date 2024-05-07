@@ -20,7 +20,7 @@ def _get_successful_response_template(
 
 async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        url = ScreenshotService.validate_url(update.message.text)
+        url = await ScreenshotService.get_url(update.message.text, update.effective_user.id)
     except ValidationException:
         return
 
@@ -28,7 +28,7 @@ async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_id = await send_text(update, context, text="⏳" + locale.main, is_reply=True)
 
     try:
-        screenshot_data = await ScreenshotService.get_data(url)
+        screenshot_data = await ScreenshotService.get_data(url, update.effective_user.id)
     except (UploadException, WebDriverException):
         await edit_text(update, context, text="🫣" + locale.error, message_id=message_id)
         return

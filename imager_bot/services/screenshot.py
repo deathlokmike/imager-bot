@@ -3,11 +3,13 @@ import time
 import httpx
 import validators
 
+from imager_bot.database.dao.stats import UsersStatisticsDaO
 from imager_bot.database.dao.users import UsersDaO
 from imager_bot.services.driver import Browser
 from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.translator import Translator
 from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
+from selenium.common.exceptions import WebDriverException
 
 
 async def upload_image_to_telegraph(image: bytes) -> str:
@@ -25,25 +27,38 @@ async def upload_image_to_telegraph(image: bytes) -> str:
 class ScreenshotService:
 
     @classmethod
-    def validate_url(cls, _url: str) -> str:
-        if not validators.url(_url):
-            _url = f'http://' + _url
-            if not validators.url(_url):
+    def _validate_message(cls, message: str) -> str:
+        if not validators.url(message):
+            message = f'http://' + message
+            if not validators.url(message):
                 raise ValidationException
-        return _url
+        return message
 
     @classmethod
-    async def get_data(cls, url: str) -> ScreenshotData:
+    async def get_url(cls, message: str, tg_id: int) -> str:
+        try:
+            return cls._validate_message(message)
+        except ValidationException:
+            await UsersStatisticsDaO.increase_bad_request(tg_id)
+            raise ValidationException
+
+    @classmethod
+    async def get_data(cls, url: str, tg_id: int) -> ScreenshotData:
         start_ = time.time()
-        page_data = Browser().get_screenshot(url)
-        explained_time = time.time() - start_
-        src = await upload_image_to_telegraph(page_data.screenshot)
-        return ScreenshotData(
-            explained_time=explained_time,
-            title=page_data.title,
-            img_source=f'https://telegra.ph{src}',
-            url=url
-        )
+        try:
+            page_data = Browser().get_screenshot(url)
+            explained_time = time.time() - start_
+            src = await upload_image_to_telegraph(page_data.screenshot)
+            await UsersStatisticsDaO.increase_screenshot(tg_id)
+            return ScreenshotData(
+                explained_time=explained_time,
+                title=page_data.title,
+                img_source=f'https://telegra.ph{src}',
+                url=url
+            )
+        except (WebDriverException, UploadException) as exc:
+            await UsersStatisticsDaO.increase_bad_request(tg_id)
+            raise exc
 
     @classmethod
     async def get_locales(cls, tg_id: int) -> ScreenshotMessageLocale:
