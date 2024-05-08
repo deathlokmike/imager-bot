@@ -16,6 +16,7 @@ from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.translator import Translator
 from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
 from imager_bot.services.whois import get_whois_text
+from imager_bot.services.users import UsersService
 
 if TYPE_CHECKING:
     from imager_bot.services.types import PageData
@@ -59,6 +60,7 @@ class ScreenshotService:
 
     @classmethod
     async def get_url(cls, message: str, tg_id: int) -> str:
+        await UsersService.validate_user(tg_id)
         try:
             return cls._validate_message(message)
         except ValidationException:
