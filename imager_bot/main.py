@@ -13,7 +13,8 @@ CALLBACK_QUERY_HANDLERS = {
 }
 
 COMMAND_HANDLERS = {
-    "start": handlers.start
+    "start": handlers.start,
+    "help": handlers.start
 }
 
 logging.basicConfig(
@@ -25,14 +26,20 @@ logger = logging.getLogger(__name__)
 
 def main():
     application = ApplicationBuilder().token(settings.TG_BOT_TOKEN).concurrent_updates(True).build()
+
     for command_name, command_handler in COMMAND_HANDLERS.items():
         application.add_handler(CommandHandler(command_name, command_handler))
+
     for pattern, handler in CALLBACK_QUERY_HANDLERS.items():
         application.add_handler(CallbackQueryHandler(handler, pattern=pattern))
 
     application.add_handler(
         MessageHandler(filters.TEXT & (~filters.COMMAND), handlers.take_screenshot)
     )
+
+    application.add_handler(
+        MessageHandler(filters.COMMAND, handlers.unknown))
+
     application.run_polling()
 
 

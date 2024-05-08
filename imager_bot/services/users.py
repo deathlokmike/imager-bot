@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 class UsersService:
     @classmethod
-    async def _validate_user(cls, tg_id) -> "Users":
+    async def validate_user(cls, tg_id: int) -> "Users":
         user = await UsersDaO.get_by_id(tg_id)
         if not user:
             user = await UsersDaO.add(
@@ -24,7 +24,7 @@ class UsersService:
 
     @classmethod
     async def get_start_message(cls, tg_id: int) -> StartMessageLocale:
-        user = await cls._validate_user(tg_id)
+        user = await cls.validate_user(tg_id)
         await UsersStatisticsDaO.increase_start(tg_id)
         translator = Translator(user.locale)
         start_message_locale: StartMessageLocale = translator.get_translate("start", StartMessageLocale)
@@ -33,7 +33,7 @@ class UsersService:
 
     @classmethod
     async def get_choose_language_message(cls, tg_id: int) -> MessageLocale:
-        user = await cls._validate_user(tg_id)
+        user = await cls.validate_user(tg_id)
         translator = Translator(user.locale)
         message_locale: MessageLocale = translator.get_translate("choose_lang", MessageLocale)
 
@@ -41,5 +41,5 @@ class UsersService:
 
     @classmethod
     async def set_language(cls, tg_id: int, language: str):
-        await cls._validate_user(tg_id)
+        await cls.validate_user(tg_id)
         await UsersDaO.update_language(tg_id, language)
