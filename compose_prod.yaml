@@ -21,7 +21,7 @@ services:
     entrypoint: /bin/sh
     volumes:
       - selenium_drivers:/root/.cache/selenium:Z
-    command: -c 'python imager_bot/main.py'
+    command: -c 'alembic upgrade head && python imager_bot/init_db.py &&python imager_bot/main.py'
     env_file:
       - .env
     depends_on:
