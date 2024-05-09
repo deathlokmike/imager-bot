@@ -24,6 +24,7 @@ from imager_bot.services.whois import get_whois_text
 
 if TYPE_CHECKING:
     from imager_bot.services.types import PageData
+from loguru import logger
 
 
 async def _upload_image_to_telegraph(image: bytes) -> str:
@@ -33,8 +34,11 @@ async def _upload_image_to_telegraph(image: bytes) -> str:
             files={'file': ('file', image, 'image/png')})
         if response.status_code == 200:
             json_ = response.json()[0]
-            return json_.get("src")
+            src = json_.get("src")
+            logger.debug(f"Image saves to https://telegra.ph{src}")
+            return src
         else:
+            logger.warning(f"Telegraph error: {response}")
             raise UploadException
 
 
@@ -55,6 +59,7 @@ def _save_screenshot(tg_id: int, domain: str, image: bytes):
 
 async def _execute_screenshot_task(url: str) -> "PageData":
     with ProcessPoolExecutor() as process_pool:
+        logger.debug("Init process pool")
         loop: AbstractEventLoop = asyncio.get_running_loop()
         call = partial(_screenshot_task, url)
         tasks = [loop.run_in_executor(process_pool, call)]

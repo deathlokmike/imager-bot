@@ -1,7 +1,7 @@
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
-
+from loguru import logger
 from imager_bot.config import settings
 
 db_params = {}
@@ -12,7 +12,7 @@ if settings.MODE in ["TEST", "DEV"]:
         db_params["poolclass"] = NullPool
 else:
     db_url = f"postgresql+asyncpg://{settings.get_database_url}"
-
+logger.debug(f"Init async engine [{db_params}]")
 engine = create_async_engine(db_url, **db_params)
 async_session: async_sessionmaker[AsyncSession] = async_sessionmaker(
     bind=engine, class_=AsyncSession, expire_on_commit=False

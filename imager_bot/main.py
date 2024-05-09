@@ -1,5 +1,4 @@
-import logging
-
+from loguru import logger
 from telegram.ext import (ApplicationBuilder, CallbackQueryHandler,
                           CommandHandler, MessageHandler, filters)
 
@@ -17,14 +16,16 @@ COMMAND_HANDLERS = {
     "help": handlers.start
 }
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+logger.add(
+    sink="bot.json",
+    rotation="1 week", compression="zip",
+    level=settings.LOG_LEVEL,
+    serialize=True
 )
-logger = logging.getLogger(__name__)
 
 
 def main():
+    logger.info("Start app")
     application = ApplicationBuilder().token(settings.TG_BOT_TOKEN).concurrent_updates(True).build()
 
     for command_name, command_handler in COMMAND_HANDLERS.items():

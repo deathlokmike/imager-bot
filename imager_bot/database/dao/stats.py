@@ -4,6 +4,7 @@ from imager_bot.database.config import async_session
 from imager_bot.database.dao.base import BaseDAO
 from imager_bot.database.models.stats import UsersStatistics
 from imager_bot.services.utils import naive_utcnow
+from loguru import logger
 
 
 class UsersStatisticsDaO(BaseDAO):
@@ -13,6 +14,7 @@ class UsersStatisticsDaO(BaseDAO):
     async def add(cls, **data) -> UsersStatistics:
         data["start_date"] = naive_utcnow()
         data["last_message_date"] = naive_utcnow()
+        logger.debug(f"Added new user: {data}")
         return await super().add(**data)
 
     @classmethod
@@ -23,6 +25,7 @@ class UsersStatisticsDaO(BaseDAO):
                 .filter(UsersStatistics.id == tg_id).
                 values(**arg, last_message_date=naive_utcnow())
             )
+        logger.debug(f"Execute: {query}")
         await session.execute(query)
         await session.commit()
 
@@ -45,4 +48,3 @@ class UsersStatisticsDaO(BaseDAO):
     async def increase_whois_request(cls, tg_id: int):
         arg = {"whois_request_count": UsersStatistics.__table__.c.whois_request_count + 1}
         await cls._increase_value(tg_id, **arg)
-

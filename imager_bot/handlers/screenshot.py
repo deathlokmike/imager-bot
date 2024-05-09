@@ -1,3 +1,4 @@
+from loguru import logger
 from selenium.common.exceptions import WebDriverException
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
@@ -17,6 +18,7 @@ def _get_successful_response_template(
             f"⌛<b>{locale.process_time}:</b> {screenshot_data.explained_time:.2f}")
 
 
+@logger.catch
 async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     try:
         url = await ScreenshotService.get_url(update.message.text, update.effective_user.id)
@@ -41,6 +43,7 @@ async def take_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await edit_text(update, context, text=text, message_id=message_id, markup=markup)
 
 
+@logger.catch
 async def whois_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()

@@ -1,3 +1,4 @@
+from loguru import logger
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 
@@ -21,11 +22,13 @@ async def get_start_locales_and_markup(update: Update):
     return locales, markup
 
 
+@logger.catch
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     locales, markup = await get_start_locales_and_markup(update)
     await send_text(update, context, locales.main, markup=markup)
 
 
+@logger.catch
 async def choose_lang_button(update: Update, _: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -43,6 +46,7 @@ async def choose_lang_button(update: Update, _: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(text=locales.main, reply_markup=reply_markup)
 
 
+@logger.catch
 async def lang_button(update: Update, _: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()

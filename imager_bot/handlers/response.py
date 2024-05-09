@@ -2,7 +2,7 @@ from typing import Optional
 
 from telegram import InlineKeyboardMarkup, Message, Update
 from telegram.ext import ContextTypes
-
+from loguru import logger
 
 async def send_text(
         update: Update,
@@ -21,7 +21,7 @@ async def send_text(
         args["reply_markup"] = markup
     if enable_parse_mode:
         args["parse_mode"] = "html"
-
+    logger.debug(f"Send message to {update.effective_user.id}: {text}")
     message: Message = await context.bot.send_message(**args)
     return message.message_id
 
@@ -41,4 +41,5 @@ async def edit_text(
     }
     if markup:
         args["reply_markup"] = markup
+    logger.debug(f"Edit message to {update.effective_user.id}: {text}")
     await context.bot.edit_message_text(**args)
