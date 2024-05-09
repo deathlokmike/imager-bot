@@ -1,8 +1,11 @@
 import asyncio
+import os
 import time
 from asyncio.events import AbstractEventLoop
 from concurrent.futures import ProcessPoolExecutor
+from datetime import datetime
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import httpx
@@ -15,14 +18,15 @@ from imager_bot.services.driver import Browser
 from imager_bot.services.exceptions import UploadException, ValidationException
 from imager_bot.services.translator import Translator
 from imager_bot.services.types import ScreenshotData, ScreenshotMessageLocale
-from imager_bot.services.whois import get_whois_text
 from imager_bot.services.users import UsersService
+from imager_bot.services.utils import naive_utcnow
+from imager_bot.services.whois import get_whois_text
 
 if TYPE_CHECKING:
     from imager_bot.services.types import PageData
 
 
-async def upload_image_to_telegraph(image: bytes) -> str:
+async def _upload_image_to_telegraph(image: bytes) -> str:
     async with httpx.AsyncClient() as client:
         response = await client.post(
             url='https://telegra.ph/upload',
@@ -38,7 +42,18 @@ def _screenshot_task(url: str) -> "PageData":
     return Browser().get_screenshot(url)
 
 
-async def execute_screenshot_task(url: str) -> "PageData":
+def _save_screenshot(tg_id: int, domain: str, image: bytes):
+    home = Path.home()
+    date = datetime.strftime(naive_utcnow(), '%d-%m-%y-%H-%M-%S')
+    cache = os.path.join(home, ".cache", "imager_bot")
+    if not os.path.exists(cache):
+        os.mkdir(cache)
+    image_path = f"{date}_{tg_id}_{domain}.png"
+    with open(os.path.join(cache, image_path), "wb") as f:
+        f.write(image)
+
+
+async def _execute_screenshot_task(url: str) -> "PageData":
     with ProcessPoolExecutor() as process_pool:
         loop: AbstractEventLoop = asyncio.get_running_loop()
         call = partial(_screenshot_task, url)
@@ -71,9 +86,10 @@ class ScreenshotService:
     async def get_data(cls, url: str, tg_id: int) -> ScreenshotData:
         start_ = time.time()
         try:
-            page_data = await execute_screenshot_task(url)
+            page_data = await _execute_screenshot_task(url)
             explained_time = time.time() - start_
-            src = await upload_image_to_telegraph(page_data.screenshot)
+            src = await _upload_image_to_telegraph(page_data.screenshot)
+            _save_screenshot(tg_id, page_data.domain, page_data.screenshot)
             await UsersStatisticsDaO.increase_screenshot(tg_id)
             return ScreenshotData(
                 explained_time=explained_time,

@@ -21,7 +21,8 @@ services:
     entrypoint: /bin/sh
     volumes:
       - selenium_drivers:/root/.cache/selenium:Z
-    command: -c 'alembic upgrade head && python imager_bot/init_db.py &&python imager_bot/main.py'
+      - imager_screenshots:/root/.cache/imager_bot:Z
+    command: -c 'alembic upgrade head && python imager_bot/init_db.py && python imager_bot/main.py'
     env_file:
       - .env
     depends_on:
@@ -30,3 +31,4 @@ services:
 volumes:
   postgres_data: {}
   selenium_drivers: {}
+  imager_screenshots: {}

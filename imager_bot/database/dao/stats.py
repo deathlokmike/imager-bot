@@ -3,7 +3,7 @@ from sqlalchemy import update
 from imager_bot.database.config import async_session
 from imager_bot.database.dao.base import BaseDAO
 from imager_bot.database.models.stats import UsersStatistics
-from imager_bot.database.utils import naive_utcnow
+from imager_bot.services.utils import naive_utcnow
 
 
 class UsersStatisticsDaO(BaseDAO):
