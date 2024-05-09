@@ -1,7 +1,9 @@
 import asyncio
 from asyncio import StreamReader
 from asyncio.subprocess import Process
+
 from loguru import logger
+
 
 async def _write_output(stdout: StreamReader, buf: list):
     while line := await stdout.readline():

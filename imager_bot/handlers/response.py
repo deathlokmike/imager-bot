@@ -1,8 +1,9 @@
 from typing import Optional
 
+from loguru import logger
 from telegram import InlineKeyboardMarkup, Message, Update
 from telegram.ext import ContextTypes
-from loguru import logger
+
 
 async def send_text(
         update: Update,
