@@ -1,5 +1,4 @@
 {
   "main": "\uD83D\uDD96 I am a copy of the @siteshot_bot bot. I serve to create screenshots of web pages.\n\nSend the URL of the page (for example, google.com).\n\nI use chromedriver, so some sites (for example, ya.ru) they may require you to enter a captcha. Unfortunately, I am not able to circumvent this limitation \uD83D\uDE1E",
-  "choose_lang_button": "\uD83C\uDDFA\uD83C\uDDF8 Choose language",
-  "add_bot_to_group_button": "\uD83D\uDC65 Add bot to the chat"
+  "choose_lang_button": "\uD83C\uDDFA\uD83C\uDDF8 Choose language"
 }

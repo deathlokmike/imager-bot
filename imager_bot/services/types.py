@@ -9,7 +9,6 @@ class MessageLocale:
 @dataclass
 class StartMessageLocale(MessageLocale):
     choose_lang_button: str
-    add_bot_to_group_button: str
 
 
 @dataclass

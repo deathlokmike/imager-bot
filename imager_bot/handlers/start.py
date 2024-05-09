@@ -14,9 +14,6 @@ async def get_start_locales_and_markup(update: Update):
         [InlineKeyboardButton(
             locales.choose_lang_button,
             callback_data=settings.PATTERNS.CHOOSE_LANG_CALLBACK)],
-        [InlineKeyboardButton(
-            locales.add_bot_to_group_button,
-            callback_data=settings.PATTERNS.ADD_BOT_TO_GROUP_CALLBACK)],
     ]
     markup = InlineKeyboardMarkup(keyboard)
     return locales, markup
