@@ -5,8 +5,6 @@ services:
     container_name: imager_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "${DB_PORT}:${DB_PORT}"
     environment:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
